@@ -1,0 +1,16 @@
+{
+  "name": "backend_course",
+  "version": "1.0.0",
+  "description": "Learning industry standard full backend course",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "javascript",
+    "backend",
+    "Bhargav"
+  ],
+  "author": "Gujjla Bhargav Sai Durga",
+  "license": "ISC"
+}
