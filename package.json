@@ -1,4 +1,4 @@
-{ 
+{
   "name": "backend_course",
   "version": "1.0.0",
   "description": "Learning industry standard full backend course",
@@ -15,6 +15,7 @@
   "author": "Gujjla Bhargav Sai Durga",
   "license": "ISC",
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.10",
+    "prettier": "^3.5.3"
   }
 }
