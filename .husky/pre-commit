@@ -42,9 +42,11 @@ fi
 
 COVERAGE_OK=1
 for FILE in $FILES; do
-  npx vitest run --coverage.enabled true --coverage.include="$FILE" --coverage.threshold.lines=75
-  if [ $? -ne 0 ]; then
-    echo "❌ Coverage for $FILE is below 75%."
+  
+  if ! npx vitest run --coverage.enabled true --coverage.include="$FILE" --coverage.threshold.lines=75 ; then
+    echo " "
+    echo " ===================================================== "$FILE" COVERAGE FAILED =================================================== "
+    echo "❌ Coverage for $FILE is below 80%."
     COVERAGE_OK=0
   fi
 done
@@ -52,16 +54,15 @@ done
 if [ $COVERAGE_OK -eq 0 ]; then
   echo " "
   echo " ===================================================== COVERAGE FAILED =================================================== "
-  echo "❌ All staged files must have at least 75% test coverage."
+  echo "❌ All staged files must have at least 80% test coverage."
   exit 1
 fi
 
 # Run prettier in silent mode and capture result, warn if issues
-PRETTIER_OUT=$(prettier --check $FILES --ignore-unknown 2>&1)
-if [ $? -ne 0 ]; then
+if ! prettier --check $FILES --ignore-unknown ; then
   echo " "
   echo " ===================================================== PRETTIER WARNINGS =================================================== "
-  echo "⚠️  Prettier found formatting issues in the following files:"
-  echo "$PRETTIER_OUT" | grep -E '\.js|\.ts|\.jsx|\.tsx'
-  echo "You may want to run: npm run format"
+  echo "⚠️   Prettier found formatting issues in the following files:"
+  echo "     Run this command to Fix ✅ : ======  [npm run format]  ========"
+  exit 1
 fi

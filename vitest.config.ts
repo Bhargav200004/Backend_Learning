@@ -1,12 +1,12 @@
-import { defineConfig } from 'vitest/config'
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
     coverage: {
       provider: 'v8',
-      reporter: ['lcov'],
-      include: ['src'],              // ✅ only include src folder
-      exclude: ['**/__test__/**'],   // ❌ skip test files/folders
+      reporter: ['text', 'lcov', 'clover'],
+      include: ['src'], // ✅ only include src folder
+      exclude: ['**/__test__/**'], // ❌ skip test files/folders
       thresholds: {
         lines: 80,
         functions: 80,
@@ -15,4 +15,4 @@ export default defineConfig({
       },
     },
   },
-})
+});
