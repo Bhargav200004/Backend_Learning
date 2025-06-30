@@ -1,3 +1,11 @@
-# .husky/pre-commit
-prettier $(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g') --write --ignore-unknown
-git update-index --again
+npm test || exit 1
+
+# Get staged files
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
+
+prettier --check $FILES --ignore-unknown
+
+if [ $? -ne 0 ]; then
+  echo "❌ Prettier found formatting issues. Please run: prettier --write <filename>"
+  exit 1
+fi
