@@ -33,44 +33,42 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, 'User already exsist');
   }
 
-  console.log("Avatar => " , req.files?.avatar);
+  console.log('Avatar => ', req.files?.avatar);
 
-  const avatarLocalPath =  req.files?.avatar[0]?.path;
+  const avatarLocalPath = req.files?.avatar[0]?.path;
   const coverImageLocalPath = req.files?.coverImage[0]?.path;
 
   if (!avatarLocalPath) {
-    throw new ApiError(400, "Avatar file required");
+    throw new ApiError(400, 'Avatar file required');
   }
 
   const avatar = await uploadCloudanary(avatarLocalPath);
   const coverImage = await uploadCloudanary(coverImageLocalPath);
 
-  if (!avatar){
-    throw new ApiError(400, "Avatar file required");
+  if (!avatar) {
+    throw new ApiError(400, 'Avatar file required');
   }
 
   const user = await User.create({
     fullName,
-    username : username.toLowercase(),
+    username: username.toLowercase(),
     avatar: avatar.url,
-    coverImage : coverImage?.url || "",
+    coverImage: coverImage?.url || '',
     email,
-    password
-  })
+    password,
+  });
 
   const createduser = await User.findById(user._id).select(
-    "-password -refreshToken"
-  )
+    '-password -refreshToken'
+  );
 
-  if (!coverImage){
-    throw new ApiError(500 , "Something went wrong while register user");
+  if (!coverImage) {
+    throw new ApiError(500, 'Something went wrong while register user');
   }
 
-  return  res.status(201).json(
-    new ApiResponse(200 , createduser , "User Register Successfully")
-  )
-  
-
+  return res
+    .status(201)
+    .json(new ApiResponse(200, createduser, 'User Register Successfully'));
 });
 
-export  {registerUser} ;
+export { registerUser };
