@@ -1,14 +1,5 @@
-if ! npm test; then
-  echo " "
-  echo " ===================================================== TEST FAILED =================================================== "
-  echo "❌ Tests failed . Please run:"
-  echo "    npm run test" 
-  exit 1
-fi
-
 # Get staged JS/TS files inside src, but exclude __test__ folder
 FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^src/.*\.(js|ts|jsx|tsx)$')
-
 
 # Skip coverage and formatting if no relevant files are staged
 if [ -z "$FILES" ]; then
@@ -19,10 +10,10 @@ fi
 MISSING_TESTS=0
 for FILE in $FILES; do
   # Skip files that are already test files
-  if [[ "$FILE" == *.test.* ]]; then
+  if [[ "$FILE" == *.test.js || "$FILE" == *.test.ts || "$FILE" == *.test.jsx || "$FILE" == *.test.tsx ]]; then
     continue
   fi
-  BASENAME=$(basename "$FILE" .js | sed 's/\.[^.]*$//')
+  BASENAME=$(basename "$FILE" | sed -E 's/\.(js|ts|jsx|tsx)$//')
   EXT="${FILE##*.}"
   MATCHING_TEST=$(find src/__test__ -type f -name "${BASENAME}.test.${EXT}")
   if [ -z "$MATCHING_TEST" ]; then
@@ -38,12 +29,19 @@ if [ $MISSING_TESTS -eq 1 ]; then
   exit 1
 fi
 
-# Run vitest coverage for each staged file and check threshold
+# Check test status
+if ! npm test; then
+  echo " "
+  echo " ===================================================== TEST FAILED =================================================== "
+  echo "❌ Tests failed . Please run:"
+  echo "    npm run test" 
+  exit 1
+fi
 
+# Run vitest coverage for each staged file and check threshold
 COVERAGE_OK=1
 for FILE in $FILES; do
-  
-  if ! npx vitest run --coverage.enabled true --coverage.include="$FILE" --coverage.threshold.lines=75 ; then
+  if ! npx vitest run --coverage.enabled true --coverage.include="$FILE" --coverage.threshold.lines=80 ; then
     echo " "
     echo " ===================================================== "$FILE" COVERAGE FAILED =================================================== "
     echo "❌ Coverage for $FILE is below 80%."
