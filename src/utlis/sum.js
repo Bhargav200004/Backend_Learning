@@ -3,5 +3,5 @@ export function SumFunction(a, b) {
 }
 
 export function SubFunction(a, b) {
-  return a - b;
+return a - b;
 }

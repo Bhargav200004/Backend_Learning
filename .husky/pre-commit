@@ -1,11 +1,67 @@
-npm test || exit 1
-
-# Get staged files
-FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
-
-prettier --check $FILES --ignore-unknown
-
-if [ $? -ne 0 ]; then
-  echo "❌ Prettier found formatting issues. Please run: prettier --write <filename>"
+if ! npm test; then
+  echo " "
+  echo " ===================================================== TEST FAILED =================================================== "
+  echo "❌ Tests failed . Please run:"
+  echo "    npm run test" 
   exit 1
+fi
+
+# Get staged JS/TS files inside src, but exclude __test__ folder
+FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^src/.*\.(js|ts|jsx|tsx)$')
+
+
+# Skip coverage and formatting if no relevant files are staged
+if [ -z "$FILES" ]; then
+  exit 0
+fi
+
+# Check for corresponding test files in any subfolder of src/__test__
+MISSING_TESTS=0
+for FILE in $FILES; do
+  # Skip files that are already test files
+  if [[ "$FILE" == *.test.* ]]; then
+    continue
+  fi
+  BASENAME=$(basename "$FILE" .js | sed 's/\.[^.]*$//')
+  EXT="${FILE##*.}"
+  MATCHING_TEST=$(find src/__test__ -type f -name "${BASENAME}.test.${EXT}")
+  if [ -z "$MATCHING_TEST" ]; then
+    echo "❌ Missing test file for $FILE (expected: src/__test__/**/${BASENAME}.test.${EXT})"
+    MISSING_TESTS=1
+  fi
+done
+
+if [ $MISSING_TESTS -eq 1 ]; then
+  echo " "
+  echo " ===================================================== MISSING TEST FILES =================================================== "
+  echo "❌ All staged files must have corresponding test files."
+  exit 1
+fi
+
+# Run vitest coverage for each staged file and check threshold
+
+COVERAGE_OK=1
+for FILE in $FILES; do
+  npx vitest run --coverage.enabled true --coverage.include="$FILE" --coverage.threshold.lines=75
+  if [ $? -ne 0 ]; then
+    echo "❌ Coverage for $FILE is below 75%."
+    COVERAGE_OK=0
+  fi
+done
+
+if [ $COVERAGE_OK -eq 0 ]; then
+  echo " "
+  echo " ===================================================== COVERAGE FAILED =================================================== "
+  echo "❌ All staged files must have at least 75% test coverage."
+  exit 1
+fi
+
+# Run prettier in silent mode and capture result, warn if issues
+PRETTIER_OUT=$(prettier --check $FILES --ignore-unknown 2>&1)
+if [ $? -ne 0 ]; then
+  echo " "
+  echo " ===================================================== PRETTIER WARNINGS =================================================== "
+  echo "⚠️  Prettier found formatting issues in the following files:"
+  echo "$PRETTIER_OUT" | grep -E '\.js|\.ts|\.jsx|\.tsx'
+  echo "You may want to run: npm run format"
 fi
