@@ -1,5 +1,19 @@
+# Allow commit if there are no staged JS/TS/JSX/TSX files in src/
+ALL_STAGED=$(git diff --cached --name-only --diff-filter=ACMR)
+
+echo "DEBUG: Staged src files: $ALL_STAGED"
+
+CODE_FILES=$(echo "$ALL_STAGED" | grep -E '^src/.*\.(js|ts|jsx|tsx)$' || true)
+
+echo "DEBUG: Staged src files: $CODE_FILES"
+if [ -z "$CODE_FILES" ]; then
+  exit 0
+fi
+
 # Get staged JS/TS files inside src, but exclude __test__ folder
 FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^src/.*\.(js|ts|jsx|tsx)$')
+
+echo "DEBUG: Staged src files: $FILES"
 
 # Skip coverage and formatting if no relevant files are staged
 if [ -z "$FILES" ]; then
