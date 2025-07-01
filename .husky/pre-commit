@@ -56,6 +56,13 @@ if [ $COVERAGE_OK -eq 0 ]; then
   exit 1
 fi
 
+# Run linted-staged
+if ! npx lint-staged ; then 
+  echo " "
+  echo " ===================================================== LINT STAGED =================================================== "
+  exit 1
+fi
+
 # Run prettier in silent mode and capture result, warn if issues
 if ! prettier --check $FILES --ignore-unknown ; then
   echo " "

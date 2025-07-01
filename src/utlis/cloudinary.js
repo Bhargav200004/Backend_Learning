@@ -14,15 +14,15 @@ const uploadCloudanary = async (localFilePath) => {
 
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: 'auto',
-    })
-    console.log('File is uploaded cloudanary', response)
+    });
+    console.log('File is uploaded cloudanary', response);
 
-    return response
+    return response;
   } catch (error) {
-    fs.unlinkSync() // remove corrupted file
+    fs.unlinkSync(); // remove corrupted file
 
-    return null
+    return null;
   }
 };
 
-export {uploadCloudanary};
+export { uploadCloudanary };
