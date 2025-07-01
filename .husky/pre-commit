@@ -2,7 +2,7 @@
 FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^src/.*\.(js|ts|jsx|tsx)$')
 
 # Skip coverage and formatting if no relevant files are staged
-if ! git diff --cached --name-only --diff-filter=ACMR | grep -E '^src/.*\.(js|ts|jsx|tsx)$'; then
+if [ -z "$FILES" ]; then
   exit 0
 fi
 
@@ -56,9 +56,10 @@ if [ $COVERAGE_OK -eq 0 ]; then
   exit 1
 fi
 
-echo "🧹 Running lint‑staged…"
-if ! npx lint-staged; then
-  echo "🚫 Commit rejected – lint‑staged found problems."
+# Run linted-staged
+if ! npx lint-staged ; then 
+  echo " "
+  echo " ===================================================== LINT STAGED =================================================== "
   exit 1
 fi
 
