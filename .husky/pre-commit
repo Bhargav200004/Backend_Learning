@@ -1,8 +1,6 @@
 # Get staged JS/TS files inside src, but exclude __test__ folder
 FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^src/.*\.(js|ts|jsx|tsx)$' || true)
 
-echo "DEBUG: Staged src files: $FILES"
-
 # Skip coverage and formatting if no relevant files are staged
 if [ -z "$FILES" ]; then
   exit 0
