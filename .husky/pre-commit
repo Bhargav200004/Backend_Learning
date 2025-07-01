@@ -2,7 +2,7 @@
 FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^src/.*\.(js|ts|jsx|tsx)$')
 
 # Skip coverage and formatting if no relevant files are staged
-if [ -z "$FILES" ]; then
+if ! git diff --cached --name-only --diff-filter=ACMR | grep -E '^src/.*\.(js|ts|jsx|tsx)$'; then
   exit 0
 fi
 
