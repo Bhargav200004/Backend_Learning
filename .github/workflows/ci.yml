@@ -23,7 +23,7 @@ jobs:
         run: npm ci
 
       - name: Run tests
-        run: npm run type-check
+        run: npm run test
 
       - name: Run ESLint and fix
         run: npm run lint:fix
